@@ -13,7 +13,7 @@ name: |-
   
     jobs:
       do:
-        uses:  cloudposse/github-actions-workflows/.github/workflows/controller-atmos-affected-stacks.yml@main
+        uses:  itisopen/github-actions-workflows/.github/workflows/controller-atmos-affected-stacks.yml@itisopen
   ```
 
 on:
@@ -54,7 +54,7 @@ jobs:
               },
               jobs: {
                 do: {
-                  uses: 'cloudposse/github-actions-workflows-atmos/.github/workflows/stack-deploy.yml@main',
+                  uses: 'itisopen/github-actions-workflows-atmos/.github/workflows/stack-deploy.yml@itisopen',
                   with: {
                     stack: x,
                     component: x,

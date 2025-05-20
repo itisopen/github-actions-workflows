@@ -11,7 +11,7 @@ name: |-
       
     jobs:
       ci-codeowners:
-        uses: cloudposse/github-actions-workflows/.github/workflows/ci-codeowners-full.yml@main
+        uses: itisopen/github-actions-workflows/.github/workflows/ci-codeowners-full.yml@itisopen
         with:
           is_fork: $\{\{ github.event.pull_request.head.repo.full_name != github.repository \}\}
         secrets: inherit

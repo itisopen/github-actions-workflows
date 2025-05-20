@@ -4,26 +4,34 @@
 | Name | Description |
 |------|-------------|
 | [CD - Deploy to EKS with ArgoCD and Helmfile](#cd---deploy-to-eks-with-argocd-and-helmfile) | Deploy Docker image to EKS with ArgoCD and Helmfile |
+| [CD - Atmos stack deploy](#cd---atmos-stack-deploy) | Deploy atmos stack |
+| [CD - Deploy to ECS with Ecspresso](#cd---deploy-to-ecs-with-ecspresso) | Deploy Docker image to ECS with Ecspresso |
 | [CD - Deploy to ECS with Spacelift](#cd---deploy-to-ecs-with-spacelift) | Deploy Docker image to ECS with Spacelift |
 | [CD - Deploy to EKS with Helmfile](#cd---deploy-to-eks-with-helmfile) | Deploy Docker image to EKS with Helmfile |
 | [CD - Deploy to EKS Preview envs with Helmfile](#cd---deploy-to-eks-preview-envs-with-helmfile) | Deploy Docker image to ECS Preview envs with Helmfile |
+| [CD - Deploy to ECS QA/Preview envs with Ecspresso](#cd---deploy-to-ecs-qapreview-envs-with-ecspresso) | Deploy Docker image to ECS QA/Preview envs with Ecspresso |
 | [CD - Deploy to ECS QA/Preview envs with Spacelift](#cd---deploy-to-ecs-qapreview-envs-with-spacelift) | Deploy Docker image to ECS QA/Preview envs with Spacelift |
 | [CD - Deploy to EKS Preview envs with Helmfile](#cd---deploy-to-eks-preview-envs-with-helmfile) | Deploy Docker image to ECS Preview envs with Helmfile |
+| [CI - Atmos stack plan](#ci---atmos-stack-plan) | Plan atmos stack |
 | [CI - Codeowners](#ci---codeowners) | Validate CODEOWNERS and suggest changes |
 | [CI - Build Docker image](#ci---build-docker-image) | Build Docker image and push it to ECR |
 | [CI - Promote or build Docker image](#ci---promote-or-build-docker-image) | Promote or build Docker image and push it to ECR |
 | [CI - Promote Docker image ](#ci---promote-docker-image) | Promote Docker image to specific version tag and push it to ECR |
 | [CI - Verify Docker image exists](#ci---verify-docker-image-exists) | Verify Docker image exists on ECR |
+| [CI - GitHub Action](#ci---github-action) | Lint and test github action |
 | [CI - Readme](#ci---readme) | Validate README.yaml, README.md and suggest changes |
 | [CI - Terraform ChatOps](#ci---terraform-chatops) | Trigger terraform tests using ChatOps |
 | [CI - Terraform](#ci---terraform) | Lint, format and validate terraform code |
 | [CI - Check dist Directory](#ci---check-dist-directory) | This workflow helps ensure that generated contents of the `dist` directory matches the output of the `yarn build` |
+| [Controller - Atmos affected stacks](#controller---atmos-affected-stacks) | Get stacks affected in the commit |
+| [Controller - Atmos affected stacks](#controller---atmos-affected-stacks) | Get stacks affected in the commit |
 | [Controller - Draft release](#controller---draft-release) | Create or update draft release |
 | [Controller - Reingtegrate hotfix branch](#controller---reingtegrate-hotfix-branch) | Create PR into `target\_branch` to reintegrate hotfix from current branch  |
 | [Controller - Create Release branch](#controller---create-release-branch) | Create `release/{version}` branch for the release  |
 | [Controller - Create hotfix release](#controller---create-hotfix-release) | Create next patch version release  |
 | [Controller - Labels](#controller---labels) | Label a pull request with one or more labels |
 | [Controller - Monorepo Controller](#controller---monorepo-controller) | Mocked monorepo controller that outputs list of applications, lists of apps with and without changes. |
+| [Controller - Managing Release Branches and Tags](#controller---managing-release-branches-and-tags) | Manages long-living release branches and their releases |
 | [Controller - Release](#controller---release) | Create a github release |
 | [Scheduled Context](#scheduled-context) | Scheduled update of context.tf and related docs |
 | [Scheduled Readme](#scheduled-readme) | Scheduled update of readme.md |
@@ -45,7 +53,7 @@ Deploy Docker image to EKS with ArgoCD and Helmfile
 
   jobs:
     cd:
-      uses: cloudposse/github-actions-workflows/.github/workflows/cd-argocd.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-argocd.yml@itisopen
       with:
         image: registry.hub.docker.com/library/nginx
         tag: latest
@@ -65,8 +73,107 @@ Deploy Docker image to EKS with ArgoCD and Helmfile
 | environment | Environment name deploy to | string | N/A | true |
 | image | Docker Image to deploy | string | N/A | true |
 | organization | Repository owner organization (ex. acme for repo acme/example) | string | N/A | true |
+| path | The path where lives the helmfile or helm chart. | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | synchronously | Wait until ArgoCD successfully apply the changes | boolean | false | false |
+| tag | Docker Image tag to deploy | string | N/A | true |
+| toolchain | Toolchain ('helm', 'helmfile') | string | helmfile | false |
+| values\_file | Helmfile values file | string |  | false |
+
+
+
+### Secrets
+
+| Name | Description | Required |
+|------|-------------|----------|
+| github-private-actions-pat | Github PAT allow to pull private repos | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
+
+
+
+
+
+
+## CD - Atmos stack deploy
+
+Deploy atmos stack
+
+### Usage 
+
+```yaml
+  name: Feature Branch
+  on:
+    pull_request:
+      branches: [ 'master' ]
+      types: [opened, synchronize, reopened, closed, labeled, unlabeled]
+
+  jobs:
+    cd:
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-atmos-stack-deploy.yaml@itisopen
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| component | The component name. | string | N/A | true |
+| environment | Environment. | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| stack | The stack name. | string | N/A | true |
+
+
+
+
+
+
+
+
+## CD - Deploy to ECS with Ecspresso
+
+Deploy Docker image to ECS with Ecspresso
+
+### Usage 
+
+```yaml
+  name: Deploy
+  on:
+    push:
+      branches: [ main ]
+
+  jobs:
+    cd:
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-ecspresso.yml@itisopen
+      with:
+        image: registry.hub.docker.com/library/nginx
+        tag: latest
+        repository: ${{ github.event.repository.name }}
+        environment: dev
+        enable-migration: ${{ inputs.enable-migration }}
+        support-rollback: ${{ inputs.support-rollback }}
+      secrets:
+        secret-outputs-passphrase: "${{ secrets.secret-outputs-passphrase }}"
+        github-private-actions-pat: ${{ secrets.github-private-actions-pat }}  
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| app | Application name. Used with monorepo pattern when there are several applications in the repo | string | N/A | false |
+| enable-migration | Run DB migration | boolean | false | false |
+| environment | Environment name deploy to | string | N/A | true |
+| image | Docker Image to deploy | string | N/A | true |
+| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| path | The path tp task definition template json file. | string | ./deploy/taskdef.json | false |
+| repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| support-rollback | Perform rollback on failure | boolean | false | false |
 | tag | Docker Image tag to deploy | string | N/A | true |
 
 
@@ -76,7 +183,7 @@ Deploy Docker image to EKS with ArgoCD and Helmfile
 | Name | Description | Required |
 |------|-------------|----------|
 | github-private-actions-pat | Github PAT allow to pull private repos | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -97,7 +204,7 @@ Deploy Docker image to ECS with Spacelift
 
   jobs:
     cd:
-      uses: cloudposse/github-actions-workflows/.github/workflows/cd-ecs.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-ecs.yml@itisopen
       with:
         image: registry.hub.docker.com/library/nginx
         tag: latest
@@ -120,9 +227,10 @@ Deploy Docker image to ECS with Spacelift
 | app | Application name. Used with monorepo pattern when there are several applications in the repo | string | N/A | false |
 | environment | Environment name deploy to | string | N/A | true |
 | image | Docker Image to deploy | string | N/A | true |
-| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
-| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | spacelift-organization | Spacelift organization name | string | N/A | true |
 | tag | Docker Image tag to deploy | string | N/A | true |
 
@@ -133,7 +241,7 @@ Deploy Docker image to ECS with Spacelift
 | Name | Description | Required |
 |------|-------------|----------|
 | github-private-actions-pat | Github PAT allow to pull private repos | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 | spacelift-api-key-id | Spacelift API Key ID | true |
 | spacelift-api-key-secret | Spacelift API Key Secret | true |
 
@@ -156,7 +264,7 @@ Deploy Docker image to EKS with Helmfile
 
   jobs:
     cd:
-      uses: cloudposse/github-actions-workflows/.github/workflows/cd-helmfile.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-helmfile.yml@itisopen
       with:
         image: registry.hub.docker.com/library/nginx
         tag: latest
@@ -176,6 +284,7 @@ Deploy Docker image to EKS with Helmfile
 | environment | Environment name deploy to | string | N/A | true |
 | image | Docker Image to deploy | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["self-hosted"] | false |
 | tag | Docker Image tag to deploy | string | N/A | true |
 
 
@@ -185,7 +294,7 @@ Deploy Docker image to EKS with Helmfile
 | Name | Description | Required |
 |------|-------------|----------|
 | github-private-actions-pat | Github PAT allow to pull private repos | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -207,7 +316,7 @@ Deploy Docker image to ECS Preview envs with Helmfile
 
   jobs:
     cd:
-      uses: cloudposse/github-actions-workflows/.github/workflows/cd-preview-helmfile.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-preview-helmfile.yml@itisopen
       if: ${{ always() }}
       with:
         image: registry.hub.docker.com/library/nginx
@@ -236,9 +345,82 @@ Deploy Docker image to ECS Preview envs with Helmfile
 | labels | Pull Request labels | string | {} | false |
 | open | Pull Request open/close state. Set true if opened | boolean | N/A | true |
 | organization | Repository owner organization (ex. acme for repo acme/example) | string | N/A | true |
+| path | The path where lives the helmfile or helm chart. | string | N/A | true |
 | ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | synchronously | Wait until ArgoCD successfully apply the changes | boolean | false | false |
+| tag | Docker Image tag to deploy | string | N/A | true |
+| toolchain | Toolchain ('helm', 'helmfile') | string | helmfile | false |
+| values\_file | Helmfile values file, or helm chart values file | string |  | false |
+
+
+
+### Secrets
+
+| Name | Description | Required |
+|------|-------------|----------|
+| github-private-actions-pat | Github PAT allow to pull private repos | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
+
+
+
+
+
+
+## CD - Deploy to ECS QA/Preview envs with Ecspresso
+
+Deploy Docker image to ECS QA/Preview envs with Ecspresso
+
+### Usage 
+
+```yaml
+  name: Feature Branch
+  on:
+    pull_request:
+      branches: [ 'main' ]
+      types: [opened, synchronize, reopened, closed, labeled, unlabeled]
+
+  jobs:
+    cd:
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-preview-ecspresso.yml@itisopen
+      if: ${{ always() }}
+      with:
+        image: registry.hub.docker.com/library/nginx
+        tag: latest
+        repository: ${{ github.event.repository.name }}
+        open: ${{ github.event.pull_request.state == 'open' }}
+        labels: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        ref: ${{ github.event.pull_request.head.ref }}
+        exclusive: true
+        env-label: |
+          qa1: deploy/qa1
+          qa2: deploy/qa2  
+      secrets:
+        secret-outputs-passphrase: ${{ secrets.secret-outputs-passphrase }}
+        github-private-actions-pat: ${{ secrets.github-private-actions-pat }}
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| app | Application name. Used with monorepo pattern when there are several applications in the repo | string | N/A | false |
+| enable-migration | Run DB migration | boolean | false | false |
+| env-label | YAML formatted {environment}: {label} map | string | preview: deploy<br> | false |
+| exclusive | Deactivate previous GitHub deployments | boolean | true | false |
+| image | Docker Image to deploy | string | N/A | true |
+| labels | Pull Request labels | string | {} | false |
+| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| open | Pull Request open/close state. Set true if opened | boolean | N/A | true |
+| path | The path to task definition template json file. | string | ./deploy/taskdef.json | false |
+| ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | N/A | true |
+| repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| support-rollback | Perform rollback on failure | boolean | false | false |
 | tag | Docker Image tag to deploy | string | N/A | true |
 
 
@@ -248,7 +430,7 @@ Deploy Docker image to ECS Preview envs with Helmfile
 | Name | Description | Required |
 |------|-------------|----------|
 | github-private-actions-pat | Github PAT allow to pull private repos | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -270,7 +452,7 @@ Deploy Docker image to ECS QA/Preview envs with Spacelift
 
   jobs:
     cd:
-      uses: cloudposse/github-actions-workflows/.github/workflows/cd-preview-ecs.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-preview-ecs.yml@itisopen
       if: ${{ always() }}
       with:
         image: registry.hub.docker.com/library/nginx
@@ -304,11 +486,12 @@ Deploy Docker image to ECS QA/Preview envs with Spacelift
 | exclusive | Deactivate previous GitHub deployments | boolean | true | false |
 | image | Docker Image to deploy | string | N/A | true |
 | labels | Pull Request labels | string | {} | false |
-| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
-| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
 | open | Pull Request open/close state. Set true if opened | boolean | N/A | true |
 | ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | spacelift-organization | Spacelift organization name | string | N/A | true |
 | tag | Docker Image tag to deploy | string | N/A | true |
 
@@ -319,7 +502,7 @@ Deploy Docker image to ECS QA/Preview envs with Spacelift
 | Name | Description | Required |
 |------|-------------|----------|
 | github-private-actions-pat | Github PAT allow to pull private repos | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 | spacelift-api-key-id | Spacelift API Key ID | true |
 | spacelift-api-key-secret | Spacelift API Key Secret | true |
 
@@ -343,7 +526,7 @@ Deploy Docker image to ECS Preview envs with Helmfile
 
   jobs:
     cd:
-      uses: cloudposse/github-actions-workflows/.github/workflows/cd-preview-helmfile.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/cd-preview-helmfile.yml@itisopen
       if: ${{ always() }}
       with:
         image: registry.hub.docker.com/library/nginx
@@ -373,6 +556,7 @@ Deploy Docker image to ECS Preview envs with Helmfile
 | open | Pull Request open/close state. Set true if opened | boolean | N/A | true |
 | ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["self-hosted"] | false |
 | tag | Docker Image tag to deploy | string | N/A | true |
 
 
@@ -382,7 +566,42 @@ Deploy Docker image to ECS Preview envs with Helmfile
 | Name | Description | Required |
 |------|-------------|----------|
 | github-private-actions-pat | Github PAT allow to pull private repos | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
+
+
+
+
+
+
+## CI - Atmos stack plan
+
+Plan atmos stack
+
+### Usage 
+
+```yaml
+  name: Feature Branch
+  on:
+    pull_request:
+      branches: [ 'master' ]
+      types: [opened, synchronize, reopened, closed, labeled, unlabeled]
+
+  jobs:
+    cd:
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-atmos-stack-plan.yaml@itisopen
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| component | The component name. | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| stack | The stack name. | string | N/A | true |
+
+
 
 
 
@@ -401,9 +620,10 @@ Validate CODEOWNERS and suggest changes
     
   jobs:
     ci-codeowners:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-codeowners-full.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-codeowners-full.yml@itisopen
       with:
         is_fork: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+      secrets: inherit
 ```
 
 
@@ -416,12 +636,6 @@ Validate CODEOWNERS and suggest changes
 | runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 
 
-
-### Secrets
-
-| Name | Description | Required |
-|------|-------------|----------|
-| github\_access\_token | GitHub API token | false |
 
 
 
@@ -442,7 +656,7 @@ Build Docker image and push it to ECR
 
   jobs:
     ci:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-dockerized-app-build.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-dockerized-app-build.yml@itisopen
       with:
         organization: ${{ github.event.repository.owner.login }}
         repository: ${{ github.event.repository.name }}
@@ -461,6 +675,8 @@ Build Docker image and push it to ECR
 |------|-------------|------|---------|----------|
 | organization | Repository owner organization (ex. acme for repo acme/example) | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| tests\_enabled | Enable CI Test Stage | boolean | true | false |
 
 
 
@@ -471,7 +687,7 @@ Build Docker image and push it to ECR
 | ecr-iam-role | IAM Role ARN provide ECR write/read access | true |
 | ecr-region | ECR AWS region | true |
 | registry | ECR Docker registry | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -498,7 +714,7 @@ Promote or build Docker image and push it to ECR
 
   jobs:
     ci:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-dockerized-app-promote-or-build.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-dockerized-app-promote-or-build.yml@itisopen
       with:
         organization: ${{ github.event.repository.owner.login }}
         repository: ${{ github.event.repository.name }}
@@ -518,10 +734,11 @@ Promote or build Docker image and push it to ECR
 |------|-------------|------|---------|----------|
 | app | Application name. Used with monorepo pattern when there are several applications in the repo | string | N/A | true |
 | force-build | Force build (skip promotion) | boolean | false | true |
-| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
-| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
 | organization | Repository owner organization (ex. acme for repo acme/example) | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 
 
 
@@ -532,7 +749,7 @@ Promote or build Docker image and push it to ECR
 | ecr-iam-role | IAM Role ARN provide ECR write/read access | true |
 | ecr-region | ECR AWS region | true |
 | registry | ECR Docker registry | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -559,7 +776,7 @@ Promote Docker image to specific version tag and push it to ECR
 
   jobs:
     ci:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-dockerized-app-promote.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-dockerized-app-promote.yml@itisopen
       with:
         organization: ${{ github.event.repository.owner.login }}
         repository: ${{ github.event.repository.name }}
@@ -579,10 +796,11 @@ Promote Docker image to specific version tag and push it to ECR
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
 | app | Application name. Used with monorepo pattern when there are several applications in the repo | string | N/A | false |
-| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
-| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-key | Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
+| matrix-step-name | Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction) | string | N/A | false |
 | organization | Repository owner organization (ex. acme for repo acme/example) | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | version | New version tag | string | N/A | true |
 
 
@@ -594,7 +812,7 @@ Promote Docker image to specific version tag and push it to ECR
 | ecr-iam-role | IAM Role ARN provide ECR write/read access | true |
 | ecr-region | ECR AWS region | true |
 | registry | ECR Docker registry | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -621,7 +839,7 @@ Verify Docker image exists on ECR
 
   jobs:
     ci:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-dockerized-app-verify.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-dockerized-app-verify.yml@itisopen
       with:
         organization: ${{ github.event.repository.owner.login }}
         repository: ${{ github.event.repository.name }}
@@ -643,6 +861,7 @@ Verify Docker image exists on ECR
 | app | Application name. Used with monorepo pattern when there are several applications in the repo | string | N/A | true |
 | organization | Repository owner organization (ex. acme for repo acme/example) | string | N/A | true |
 | repository | Repository name (ex. example for repo acme/example) | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["self-hosted"] | false |
 | version | Release version tag | string | N/A | true |
 
 
@@ -654,7 +873,7 @@ Verify Docker image exists on ECR
 | ecr-iam-role | IAM Role ARN provide ECR write/read access | true |
 | ecr-region | ECR AWS region | true |
 | registry | ECR Docker registry | true |
-| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs) | true |
+| secret-outputs-passphrase | Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs) | true |
 
 
 
@@ -664,6 +883,48 @@ Verify Docker image exists on ECR
 |------|-------------|
 | image | Docker Image |
 | tag | Docker image tag |
+
+
+
+## CI - GitHub Action
+
+Lint and test github action
+
+### Usage 
+```yaml
+  name: Validate Terraform
+  on:
+    workflow_call:
+  
+  permissions:
+    pull-requests: write
+    id-token: write
+    contents: read
+
+  jobs:
+    ci-terraform:
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-terraform.yml@itisopen
+      with:
+        suggestions: true
+        filter-mode: diff_context
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| organization | Repository owner organization (ex. acme for repo acme/example) | string | ${{ github.event.repository.owner.login }} | false |
+| ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | ${{ github.ref }} | false |
+| repository | Repository name (ex. example for repo acme/example) | string | ${{ github.event.repository.name }} | false |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| tests-prefix | Workflows file name prefix to run as tests | string | test-\* | false |
+
+
+
+
+
 
 
 
@@ -684,7 +945,7 @@ Validate README.yaml, README.md and suggest changes
     
   jobs:
     ci-readme:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-readme.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-readme.yml@itisopen
       with:
         suggestions: true
         filter-mode: diff_context
@@ -696,9 +957,9 @@ Validate README.yaml, README.md and suggest changes
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
-| filter-mode | Reviewdog filter mode | string | N/A | true |
+| ref | Checkout ref | string | ${{ github.ref\_name }} | false |
+| repository | Checkout repository | string | ${{ github.repository }} | false |
 | runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
-| suggestions | Enable Reviewdog suggestions (pull request only) | boolean | N/A | true |
 
 
 
@@ -724,7 +985,7 @@ Trigger terraform tests using ChatOps
 
   jobs:
     ci-terraform-chatops:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-terraform-chatops.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-terraform-chatops.yml@itisopen
       secrets:
         github_access_token: ${{ secrets.REPO_ACCESS_TOKEN }}
 ```
@@ -767,7 +1028,7 @@ Lint, format and validate terraform code
 
   jobs:
     ci-terraform:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-terraform.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-terraform.yml@itisopen
       with:
         suggestions: true
         filter-mode: diff_context
@@ -795,7 +1056,7 @@ Lint, format and validate terraform code
 This workflow helps ensure that generated contents of the `dist` directory matches the output of the `yarn build`
 command. The `dist` directory has special meaning in GitHub Actions in that it that contains the runnable JS files. 
 
-In Cloud Posse's TypeScript actions, the `dist` directory is generated through a build process from the TypeScript 
+In ITisOpen's TypeScript actions, the `dist` directory is generated through a build process from the TypeScript 
 source files by running the `yarn build` command.
 
 
@@ -809,7 +1070,7 @@ source files by running the `yarn build` command.
 
   jobs:
     check-dist:
-      uses: cloudposse/github-actions-workflows/.github/workflows/ci-typescript-app-check-dist.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/ci-typescript-app-check-dist.yml@itisopen
 ```
 
 
@@ -822,6 +1083,79 @@ source files by running the `yarn build` command.
 | dist-path | Optional input to set a path to the dist folder. If it's not set, it defaults to './dist' | string | ./dist | false |
 | node-caching | Optional input to set up caching for the setup-node action. The input syntax corresponds to the setup-node's one. Set to an empty string if caching isn't needed | string | yarn | false |
 | node-version | Optional input to set the version of Node.js used to build a project. The input syntax corresponds to the setup-node's one | string | 16.x | false |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+
+
+
+
+
+
+
+
+## Controller - Atmos affected stacks
+
+Get stacks affected in the commit
+
+### Usage 
+
+```yaml
+  name: Stacks affected
+  on:
+    push:
+      branches: [ main ]
+
+  jobs:
+    do:
+      uses:  itisopen/github-actions-workflows/.github/workflows/controller-atmos-affected-stacks.yml@itisopen
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| head-ref | The head ref to checkout. If not provided, the head default branch is used. | string | N/A | false |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+
+
+
+
+
+### Outputs
+
+| Name | Description |
+|------|-------------|
+| has-affected-stacks | Has affected stacks |
+| stacks | Affected stacks |
+
+
+
+## Controller - Atmos affected stacks
+
+Get stacks affected in the commit
+
+### Usage 
+
+```yaml
+  name: Stacks affected
+  on:
+    push:
+      branches: [ main ]
+
+  jobs:
+    do:
+      uses:  itisopen/github-actions-workflows/.github/workflows/controller-atmos-affected-stacks.yml@itisopen
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| stacks | Stacks | string | N/A | false |
 
 
 
@@ -844,7 +1178,7 @@ Create or update draft release
 
   jobs:
     do:
-      uses:  cloudposse/github-actions-workflows/.github/workflows/controller-draft-release.yml@main
+      uses:  itisopen/github-actions-workflows/.github/workflows/controller-draft-release.yml@itisopen
       with:
         ref: ${{ github.sha }}
       secrets:
@@ -859,6 +1193,7 @@ Create or update draft release
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
 | ref | The release target, i.e. branch or commit it should point to | string | ${{ github.sha }} | false |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 
 
 
@@ -887,7 +1222,7 @@ Create PR into `target_branch` to reintegrate hotfix from current branch
 
   jobs:
     do:
-      uses: cloudposse/github-action-workflows/.github/workflows/controller-hotfix-reintegrate.yml@main
+      uses: itisopen/github-action-workflows/.github/workflows/controller-hotfix-reintegrate.yml@itisopen
       with:
         ref: ${{ github.ref }}
         target_branch: main
@@ -902,6 +1237,7 @@ Create PR into `target_branch` to reintegrate hotfix from current branch
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
 | ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | target\_branch | Target branch to reintegrate hotfix | string | main | false |
 
 
@@ -931,7 +1267,7 @@ Create `release/{version}` branch for the release
 
   jobs:
     do:
-      uses: cloudposse/github-action-workflows/.github/workflows/controller-hotfix-release-branch.yml@main
+      uses: itisopen/github-action-workflows/.github/workflows/controller-hotfix-release-branch.yml@itisopen
       with:
         version: ${{ github.event.release.tag_name }}
 ```  
@@ -942,6 +1278,7 @@ Create `release/{version}` branch for the release
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 | version | Release version | string | N/A | true |
 
 
@@ -964,7 +1301,7 @@ Create next patch version release
 
   jobs:
     do:
-      uses: cloudposse/github-action-workflows/.github/workflows/controller-hotfix-release.yml@main
+      uses: itisopen/github-action-workflows/.github/workflows/controller-hotfix-release.yml@itisopen
       with:
         ref: ${{ github.ref }}
 ```
@@ -976,6 +1313,7 @@ Create next patch version release
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
 | ref | The fully-formed ref of the branch or tag that triggered the workflow run | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 
 
 
@@ -1002,7 +1340,7 @@ Label a pull request with one or more labels
 
   jobs:
     label:
-      uses:  cloudposse/github-actions-workflows/.github/workflows/controller-labels.yml@main
+      uses:  itisopen/github-actions-workflows/.github/workflows/controller-labels.yml@itisopen
       with:
         labels: ['ready-for-review']
 ```
@@ -1037,7 +1375,7 @@ Mocked monorepo controller that outputs list of applications, lists of apps with
 
   jobs:
     do:
-      uses:  cloudposse/github-actions-workflows/.github/workflows/controller-monorepo.yml@main
+      uses:  itisopen/github-actions-workflows/.github/workflows/controller-monorepo.yml@itisopen
       with:
         dir: ./apps
 ```
@@ -1049,6 +1387,7 @@ Mocked monorepo controller that outputs list of applications, lists of apps with
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
 | dir | Directory with applications | string | N/A | true |
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 
 
 
@@ -1064,6 +1403,44 @@ Mocked monorepo controller that outputs list of applications, lists of apps with
 
 
 
+## Controller - Managing Release Branches and Tags
+
+Manages long-living release branches and their releases
+
+### Usage 
+
+```yaml
+  name: release
+  on:
+    release:
+      types:
+        - published
+  
+  permissions:
+    contents: write
+    id-token: write
+  
+  jobs:
+    terraform-module:
+      uses: itisopen/github-actions-workflows/.github/workflows/controller-release-branches.yml@itisopen
+
+```
+
+
+
+### Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|----------|
+| runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+
+
+
+
+
+
+
+
 ## Controller - Release
 
 Create a github release
@@ -1071,13 +1448,20 @@ Create a github release
 ### Usage 
 
 ```yaml
-  name: Draft release
+  name: release-branch
   on:
-    workflow_call:
+    push:
+      branches:
+        - main
+        - release/**
+  
+  permissions:
+    contents: write
+    id-token: write
 
   jobs:
     release:
-      uses:  cloudposse/github-actions-workflows/.github/workflows/controller-release.yml@main
+      uses:  itisopen/github-actions-workflows/.github/workflows/controller-release.yml@itisopen
 
 ```
 
@@ -1088,10 +1472,18 @@ Create a github release
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
 | config-name | Name of the release drafter config file | string | auto-release.yml | false |
-| ref | The release target, i.e. branch or commit it should point to | string | ${{ github.sha }} | false |
+| publish | Publish github release if true and no-release PR label is not set. | boolean | true | false |
+| ref\_name | The release target, i.e. branch to release from | string | ${{ github.ref\_name }} | false |
 | runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
+| sha | Pull request merge commit sha | string | ${{ github.sha }} | false |
 
 
+
+### Secrets
+
+| Name | Description | Required |
+|------|-------------|----------|
+| github\_access\_token | GitHub API token | false |
 
 
 
@@ -1115,7 +1507,7 @@ Scheduled update of context.tf and related docs
     
   jobs:
     scheduled-context:
-      uses: cloudposse/github-actions-workflows/.github/workflows/scheduled-context.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/scheduled-context.yml@itisopen
 ```
 
 
@@ -1157,7 +1549,7 @@ Scheduled update of readme.md
     
   jobs:
     scheduled-readme:
-      uses: cloudposse/github-actions-workflows/.github/workflows/scheduled-readme.yml@main
+      uses: itisopen/github-actions-workflows/.github/workflows/scheduled-readme.yml@itisopen
 ```
 
 
@@ -1170,12 +1562,6 @@ Scheduled update of readme.md
 | runs-on | Overrides job runs-on setting (json-encoded list) | string | ["ubuntu-latest"] | false |
 
 
-
-### Secrets
-
-| Name | Description | Required |
-|------|-------------|----------|
-| github\_access\_token | GitHub API token | true |
 
 
 

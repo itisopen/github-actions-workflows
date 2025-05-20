@@ -16,7 +16,7 @@ name: |-
       
     jobs:
       scheduled-context:
-        uses: cloudposse/github-actions-workflows/.github/workflows/scheduled-context.yml@main
+        uses: itisopen/github-actions-workflows/.github/workflows/scheduled-context.yml@itisopen
   ```
 on:
   workflow_call:
@@ -51,7 +51,7 @@ jobs:
       run: |
         if [[ -f context.tf ]]; then
           echo "Discovered existing context.tf! Fetching most recent version to see if there is an update."
-          curl -o context.tf -fsSL https://raw.githubusercontent.com/cloudposse/terraform-null-label/master/exports/context.tf
+          curl -o context.tf -fsSL https://raw.githubusercontent.com/itisopen/terraform-null-label/master/exports/context.tf
           if git diff --no-patch --exit-code context.tf; then
             echo "No changes detected! Exiting the job..."
           else
@@ -67,13 +67,13 @@ jobs:
 
     - name: Create Pull Request
       if: steps.update.outputs.create_pull_request == 'true'
-      uses: cloudposse/actions/github/create-pull-request@0.33.0
+      uses: itisopen/actions/github/create-pull-request@0.33.0
       with:
         commit-message: Update context.tf from origin source
         title: Update context.tf
         body: |-
           ## what
-          This is an auto-generated PR that updates the `context.tf` file to the latest version from `cloudposse/terraform-null-label`
+          This is an auto-generated PR that updates the `context.tf` file to the latest version from `itisopen/terraform-null-label`
 
           ## why
           To support all the features of the `context` interface.

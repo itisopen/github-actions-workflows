@@ -4,7 +4,7 @@ name: |-
   This workflow helps ensure that generated contents of the `dist` directory matches the output of the `yarn build`
   command. The `dist` directory has special meaning in GitHub Actions in that it that contains the runnable JS files. 
 
-  In Cloud Posse's TypeScript actions, the `dist` directory is generated through a build process from the TypeScript 
+  In ITisOpen's TypeScript actions, the `dist` directory is generated through a build process from the TypeScript 
   source files by running the `yarn build` command.
 
 
@@ -18,7 +18,7 @@ name: |-
 
     jobs:
       check-dist:
-        uses: cloudposse/github-actions-workflows/.github/workflows/ci-typescript-app-check-dist.yml@main
+        uses: itisopen/github-actions-workflows/.github/workflows/ci-typescript-app-check-dist.yml@itisopen
   ```
 
 on:

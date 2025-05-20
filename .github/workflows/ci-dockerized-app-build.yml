@@ -13,7 +13,7 @@ name: |-
 
     jobs:
       ci:
-        uses: cloudposse/github-actions-workflows/.github/workflows/ci-dockerized-app-build.yml@main
+        uses: itisopen/github-actions-workflows/.github/workflows/ci-dockerized-app-build.yml@itisopen
         with:
           organization: $\{\{ github.event.repository.owner.login \}\}
           repository: $\{\{ github.event.repository.name \}\}
@@ -52,7 +52,7 @@ on:
         description: "IAM Role ARN provide ECR write/read access"
         required: true
       secret-outputs-passphrase:
-        description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs)"
+        description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs)"
         required: true
       registry:
         description: "ECR Docker registry"
@@ -85,13 +85,13 @@ jobs:
 
       - name: Build
         id: build
-        uses: cloudposse/github-action-docker-build-push@1.15.0
+        uses: itisopen/github-action-docker-build-push@1.15.0
         with:
           organization: ${{ inputs.organization }}
           repository: ${{ inputs.repository }}
           registry: ${{ secrets.registry }}
 
-      - uses: cloudposse/github-action-secret-outputs@0.1.2
+      - uses: itisopen/github-action-secret-outputs@0.1.2
         id: image
         with:
           secret: ${{ secrets.secret-outputs-passphrase }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: Tests
         id: test
-        uses: cloudposse/github-action-docker-compose-test-run@0.2.0
+        uses: itisopen/github-action-docker-compose-test-run@0.2.0
         with:
           file: test/docker-compose.yml
           service: app

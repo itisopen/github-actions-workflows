@@ -18,7 +18,7 @@ name: |-
     
     jobs:
       terraform-module:
-        uses: cloudposse/github-actions-workflows/.github/workflows/controller-release-branches.yml@main
+        uses: itisopen/github-actions-workflows/.github/workflows/controller-release-branches.yml@itisopen
 
   ```
 
@@ -35,9 +35,9 @@ jobs:
   major-release-tagger:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
     steps:
-      - uses: cloudposse/github-action-major-release-tagger@v1
+      - uses: itisopen/github-action-major-release-tagger@v1
 
   release-branch-manager:
     runs-on: ${{ fromJSON(inputs.runs-on) }}
     steps:
-      - uses: cloudposse/github-action-release-branch-manager@v1
+      - uses: itisopen/github-action-release-branch-manager@v1

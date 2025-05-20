@@ -13,7 +13,7 @@ name: |-
 
     jobs:
       ci:
-        uses: cloudposse/github-actions-workflows/.github/workflows/ci-dockerized-app-promote.yml@main
+        uses: itisopen/github-actions-workflows/.github/workflows/ci-dockerized-app-promote.yml@itisopen
         with:
           organization: $\{\{ github.event.repository.owner.login \}\}
           repository: $\{\{ github.event.repository.name \}\}
@@ -46,11 +46,11 @@ on:
         required: true
         type: string
       matrix-step-name:
-        description: "Matrix step name - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction)"
+        description: "Matrix step name - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction)"
         required: false
         type: string
       matrix-key:
-        description: "Matrix key - matrix output workaround. [Read more](https://github.com/cloudposse/github-action-matrix-outputs-write#introduction)"
+        description: "Matrix key - matrix output workaround. [Read more](https://github.com/itisopen/github-action-matrix-outputs-write#introduction)"
         required: false
         type: string
       runs-on:
@@ -66,7 +66,7 @@ on:
         description: "IAM Role ARN provide ECR write/read access"
         required: true
       secret-outputs-passphrase:
-        description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/cloudposse/github-action-secret-outputs)"
+        description: "Passphrase to encrypt/decrypt secret outputs with gpg. For more information [read](https://github.com/itisopen/github-action-secret-outputs)"
         required: true
       registry:
         description: "ECR Docker registry"
@@ -95,7 +95,7 @@ jobs:
 
       - name: Context
         id: context
-        uses: cloudposse/github-action-yaml-config-query@0.1.3
+        uses: itisopen/github-action-yaml-config-query@1.0.0
         with:
           query: .${{ inputs.app == '' }}
           config: |
@@ -104,7 +104,7 @@ jobs:
             false:
               image: ${{ inputs.repository }}/${{ inputs.app }}
 
-      - uses: cloudposse/github-action-docker-promote@0.3.0
+      - uses: itisopen/github-action-docker-promote@0.3.0
         id: promote
         with:
           registry: ${{ secrets.registry }}
@@ -114,14 +114,14 @@ jobs:
           to: ${{ inputs.version }}
           use_metadata: false
 
-      - uses: cloudposse/github-action-secret-outputs@0.1.2
+      - uses: itisopen/github-action-secret-outputs@0.1.2
         id: image
         with:
           secret: ${{ secrets.secret-outputs-passphrase }}
           op: encode
           in: ${{ steps.promote.outputs.image }}
 
-      - uses: cloudposse/github-action-matrix-outputs-write@1.0.0
+      - uses: itisopen/github-action-matrix-outputs-write@1.0.0
         id: outputs
         with:
           matrix-step-name: ${{ inputs.matrix-step-name }}

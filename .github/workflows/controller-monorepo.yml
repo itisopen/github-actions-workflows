@@ -13,7 +13,7 @@ name: |-
   
     jobs:
       do:
-        uses:  cloudposse/github-actions-workflows/.github/workflows/controller-monorepo.yml@main
+        uses:  itisopen/github-actions-workflows/.github/workflows/controller-monorepo.yml@itisopen
         with:
           dir: ./apps
   ```
@@ -50,7 +50,7 @@ jobs:
 
       - name: Monorepo controller
         id: controller
-        uses: cloudposse/github-action-monorepo-random-controller@0.2.0
+        uses: itisopen/github-action-monorepo-random-controller@0.2.0
         with:
           dir: ${{ inputs.dir }}
 

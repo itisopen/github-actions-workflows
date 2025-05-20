@@ -19,7 +19,7 @@ name: |-
 
     jobs:
       release:
-        uses:  cloudposse/github-actions-workflows/.github/workflows/controller-release.yml@main
+        uses:  itisopen/github-actions-workflows/.github/workflows/controller-release.yml@itisopen
 
   ```
 
@@ -67,7 +67,7 @@ jobs:
 
       - name: Fetch pull request for the given ref
         id: get-pull-request
-        uses: cloudposse-github-actions/get-pr@v1
+        uses: itisopen-gh-actions/get-pr@v1
         with:
           sha: ${{ inputs.sha }}
 

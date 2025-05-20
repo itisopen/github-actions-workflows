@@ -13,7 +13,7 @@ name: |-
   
     jobs:
       do:
-        uses:  cloudposse/github-actions-workflows/.github/workflows/controller-atmos-affected-stacks.yml@main
+        uses:  itisopen/github-actions-workflows/.github/workflows/controller-atmos-affected-stacks.yml@itisopen
   ```
 
 on:
@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: affected
-        uses: cloudposse/github-action-atmos-affected-stacks@1.2.0
+        uses: itisopen/github-action-atmos-affected-stacks@1.2.0
         with:
           head-ref: ${{ inputs.head-ref }}
       - id: matrix
